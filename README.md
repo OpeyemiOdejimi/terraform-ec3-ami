@@ -1,110 +1,165 @@
 # Terraform Capstone Project: Automated WordPress Deployment on AWS
-Project Scenario
-DigitalBoost, a digital marketing agency, aims to elevate its online presence by launching a high-performance WordPress website for their clients. As an AWS Solutions Architect, your task is to design and implement a scalable, secure, and cost-effective WordPress solution using various AWS services. Automation through Terraform will be key to achieving a streamlined and reproducible deployment process.
 
-Pre-requisite
-Knowledge of TechOps Essentials
-Completion of Core 2 Courses and Mini Projects
-The project overview, necessary architecture, and scripts have been provided to help DigitalBoost with their WordPress-based website. Follow the instructions below to complete this Terraform Capstone Project.
+## Project: High-Performance WordPress Site for DigitalBoost
 
-Project Deliverables
-Documentation:
+### 📄 Project Description
+This project automates the deployment of a scalable, secure, and cost-effective WordPress website on AWS using Terraform. It includes VPC setup, public/private subnets, NAT Gateway, RDS MySQL, EFS, Application Load Balancer, and Auto Scaling.
 
-Detailed documentation for each component setup.
-Explanation of security measures implemented.
-Demonstration:
+---
 
-Live demonstration of the WordPress site.
-Showcase auto-scaling by simulating increased traffic.
-Project Overview
-Project Architecture
+## 📁 Directory Structure
+```
+terraform-wordpress/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── vpc.tf
+├── subnets.tf
+├── nat_gateway.tf
+├── security_groups.tf
+├── rds.tf
+├── efs.tf
+├── alb.tf
+├── autoscaling.tf
+├── userdata.sh
+└── README.md
+```
 
-Project Components
-1. VPC Setup
-VPC ARCHITECTURE
-VPC Architecture
+---
 
-Objective: Create a Virtual Private Cloud (VPC) to isolate and secure the WordPress infrastructure.
+## 🚀 Prerequisites
+- AWS CLI configured
+- Terraform installed (v1.0+)
+- SSH key pair (for EC2 access)
 
-Steps:
+---
 
-Define IP address range for the VPC.
-Create VPC with public and private subnets.
-Configure route tables for each subnet.
-Instructions for Terraform:
+## ⚙️ Steps and Code Summary
 
-Use Terraform to define VPC, subnets, and route tables.
-Leverage variables for customization.
-Document Terraform commands for execution.
-2. Public and Private Subnet with NAT Gateway
-NAT GATEWAY ARCHITECTURE
-Nat Gateway Architecture
+### 1. **VPC Setup** - `vpc.tf`
+```hcl
+resource "aws_vpc" "main" {
+  cidr_block = var.vpc_cidr
+  enable_dns_support = true
+  enable_dns_hostnames = true
+  tags = { Name = "main-vpc" }
+}
+```
 
-Objective: Implement a secure network architecture with public and private subnets. Use a NAT Gateway for private subnet internet access.
+### 2. **Public & Private Subnets with NAT Gateway** - `subnets.tf`, `nat_gateway.tf`
+```hcl
+resource "aws_subnet" "public" { ... }
+resource "aws_subnet" "private" { ... }
 
-Steps:
+resource "aws_eip" "nat" { ... }
+resource "aws_nat_gateway" "nat" { ... }
 
-Set up a public subnet for resources accessible from the internet.
-Create a private subnet for resources with no direct internet access.
-Configure a NAT Gateway for private subnet internet access.
-Instructions for Terraform:
+resource "aws_route_table" "private" {
+  route { cidr_block = "0.0.0.0/0" gateway_id = aws_nat_gateway.nat.id }
+}
+```
 
-Utilize Terraform to define subnets, security groups, and NAT Gateway.
-Ensure proper association of resources with corresponding subnets.
-Document Terraform commands for execution.
-3. AWS MySQL RDS Setup
-SECURITY GROUP ARCHITECTURE
-Security Group Architecture
+### 3. **RDS MySQL** - `rds.tf`
+```hcl
+resource "aws_db_instance" "wordpress" {
+  engine = "mysql"
+  instance_class = "db.t3.micro"
+  ...
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+}
+```
 
-Objective: Deploy a managed MySQL database using Amazon RDS for WordPress data storage.
+### 4. **EFS for WordPress** - `efs.tf`
+```hcl
+resource "aws_efs_file_system" "wordpress" { ... }
+resource "aws_efs_mount_target" "wordpress" { ... }
+```
 
-Steps:
+### 5. **Application Load Balancer** - `alb.tf`
+```hcl
+resource "aws_lb" "app_lb" {
+  name = "wordpress-alb"
+  ...
+}
 
-Create an Amazon RDS instance with the MySQL engine.
-Configure security groups for the RDS instance.
-Connect WordPress to the RDS database.
-Instructions for Terraform:
+resource "aws_lb_target_group" "wordpress_tg" { ... }
+```
 
-Define Terraform scripts for RDS instance creation.
-Configure security groups and define necessary parameters.
-Document Terraform commands for execution.
-4. EFS Setup for WordPress Files
-Objective: Utilize Amazon Elastic File System (EFS) to store WordPress files for scalable and shared access.
+### 6. **Auto Scaling Group** - `autoscaling.tf`
+```hcl
+resource "aws_launch_template" "wordpress" { ... }
+resource "aws_autoscaling_group" "wordpress_asg" {
+  desired_capacity = 2
+  max_size         = 4
+  min_size         = 1
+  ...
+}
+```
 
-Steps:
+### 7. **User Data Script** - `userdata.sh`
+```bash
+#!/bin/bash
+sudo apt update
+sudo apt install -y apache2 php php-mysql mysql-client nfs-common
+sudo mkdir -p /var/www/html
+sudo mount -t nfs4 -o nfsvers=4.1 ${efs_dns}:/ /var/www/html
+```
 
-Create an EFS file system.
-Mount the EFS file system on WordPress instances.
-Configure WordPress to use the shared file system.
-Instructions for Terraform:
+---
 
-Develop Terraform scripts to create EFS file system.
-Define configurations for mounting EFS on WordPress instances.
-Document Terraform commands for execution.
-5. Application Load Balancer
-Objective: Set up an Application Load Balancer to distribute incoming traffic among multiple instances, ensuring high availability and fault tolerance.
+## 🔐 Security Measures
+- **Security Groups:**
+  - RDS only accessible from EC2
+  - EC2 only accessible via ALB and SSH (restricted IP)
+- **Private Subnets:** RDS and sensitive components are in private subnets
+- **NAT Gateway:** Allows outbound traffic for private resources without exposing them
 
-Steps:
+---
 
-Create an Application Load Balancer.
-Configure listener rules for routing traffic to instances.
-Integrate Load Balancer with Auto Scaling group.
-Instructions for Terraform:
+## 🧪 Demonstration Guide
+1. Run `terraform init` and `terraform apply`
+2. Access the ALB DNS name to visit the WordPress site
+3. Simulate traffic using ApacheBench or similar tool:
+   ```bash
+   ab -n 1000 -c 50 http://<alb_dns>/
+   ```
+4. Observe Auto Scaling Group increasing instances (CloudWatch logs/console)
 
-Use Terraform to define Application Load Balancer configurations.
-Integrate Load Balancer with Auto Scaling group.
-Document Terraform commands for execution.
-6. Auto Scaling Group
-Objective: Implement Auto Scaling to automatically adjust the number of instances based on traffic load.
+---
 
-Steps:
+## 📌 Commands to Run
+```bash
+terraform init
+terraform plan
+terraform apply -auto-approve
+```
 
-Create an Auto Scaling group.
-Define scaling policies based on metrics like CPU utilization.
-Configure launch configurations for instances.
-Instructions for Terraform:
+---
 
-Develop Terraform scripts for Auto Scaling group creation.
-Define scaling policies and launch configurations.
-Document Terraform commands for execution.
-Note: Provide thorough documentation for each Terraform script and include necessary variable configurations. Encourage students to perform a live demonstration of the WordPress site, showcasing auto-scaling capabilities by simulating increased traffic. The documentation should explain the security measures implemented at each step.
+## 📘 Variables Example - `variables.tf`
+```hcl
+variable "vpc_cidr" { default = "10.0.0.0/16" }
+variable "public_subnet_cidr" { default = "10.0.1.0/24" }
+variable "private_subnet_cidr" { default = "10.0.2.0/24" }
+...
+```
+
+---
+
+## 📤 Outputs - `outputs.tf`
+```hcl
+output "alb_dns_name" {
+  value = aws_lb.app_lb.dns_name
+}
+```
+
+---
+
+## ✅ Final Notes
+- Use `terraform destroy` to clean up
+- All Terraform modules are reusable and modular
+- Validate logs and scaling using AWS Console or CLI
+
+---
+
+Happy Deploying 🚀
