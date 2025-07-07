@@ -2,20 +2,20 @@
 **Purpose:**
 In this mini project, you will use Terraform to create modularized configurations for building an Amazon Virtual Private Cloud (VPC) and an Amazon S3 bucket. Additionally, you will configure Terraform to use Amazon S3 as the backend storage for storing the Terraform state file.
 
-**Objectives:**
-Terraform Modules:
+## Objectives:
+**Terraform Modules:**
 
 Learn how to create and use Terraform modules for modular infrastructure provisioning.
-VPC Creation:
+**VPC Creation:**
 
 Build a reusable Terraform module for creating a VPC with specified configurations.
-S3 Bucket Creation:
+**S3 Bucket Creation:**
 
 Develop a Terraform module for creating an S3 bucket with customizable settings.
-Backend Storage Configuration:
+**Backend Storage Configuration:**
 
 Configure Terraform to use Amazon S3 as the backend storage for storing the Terraform state file.
-Project Tasks:
+**Project Tasks:**
 ## Task 1: VPC Module
 * Create a new directory for your Terraform project (e.g., terraform-modules-vpc-s3).
 
