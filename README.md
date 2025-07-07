@@ -1,90 +1,110 @@
-# Mini Project: EC2 Module and Security Group Module with Apache2 UserData
-Purpose:
-In this mini project, you will use Terraform to create modularized configurations for deploying an EC2 instance with a specified Security Group and Apache2 installed using UserData.
+# Terraform Capstone Project: Automated WordPress Deployment on AWS
+Project Scenario
+DigitalBoost, a digital marketing agency, aims to elevate its online presence by launching a high-performance WordPress website for their clients. As an AWS Solutions Architect, your task is to design and implement a scalable, secure, and cost-effective WordPress solution using various AWS services. Automation through Terraform will be key to achieving a streamlined and reproducible deployment process.
 
-Objectives:
-Terraform Module Creation:
+Pre-requisite
+Knowledge of TechOps Essentials
+Completion of Core 2 Courses and Mini Projects
+The project overview, necessary architecture, and scripts have been provided to help DigitalBoost with their WordPress-based website. Follow the instructions below to complete this Terraform Capstone Project.
 
-Learn how to create Terraform modules for modular infrastructure provisioning.
-EC2 Instance Configuration:
+Project Deliverables
+Documentation:
 
-Configure Terraform to create an EC2 instance.
-Security Group Configuration:
+Detailed documentation for each component setup.
+Explanation of security measures implemented.
+Demonstration:
 
-Create a separate module for the Security Group associated with the EC2 instance.
-UserData Script:
+Live demonstration of the WordPress site.
+Showcase auto-scaling by simulating increased traffic.
+Project Overview
+Project Architecture
 
-Utilize UserData to install and configure Apache2 on the EC2 instance.
-Project Tasks:
-Task 1: EC2 Module
-Create a new directory for your Terraform project (e.g., terraform-ec2-apache).
+Project Components
+1. VPC Setup
+VPC ARCHITECTURE
+VPC Architecture
 
-Inside the project directory, create a directory for the EC2 module (e.g., modules/ec2).
+Objective: Create a Virtual Private Cloud (VPC) to isolate and secure the WordPress infrastructure.
 
-Write a Terraform module (modules/ec2/main.tf) to create an EC2 instance.
+Steps:
 
-Task 2: Security Group Module
-Inside the project directory, create a directory for the Security Group module (e.g., modules/security_group).
+Define IP address range for the VPC.
+Create VPC with public and private subnets.
+Configure route tables for each subnet.
+Instructions for Terraform:
 
-Write a Terraform module (modules/security_group/main.tf) to create a Security Group for the EC2 instance.
+Use Terraform to define VPC, subnets, and route tables.
+Leverage variables for customization.
+Document Terraform commands for execution.
+2. Public and Private Subnet with NAT Gateway
+NAT GATEWAY ARCHITECTURE
+Nat Gateway Architecture
 
-Task 3: UserData Script
-Write a UserData script to install and configure Apache2 on the EC2 instance. Save it as a separate file (e.g., apache_userdata.sh).
+Objective: Implement a secure network architecture with public and private subnets. Use a NAT Gateway for private subnet internet access.
 
-Ensure that the UserData script is executable (chmod +x apache_userdata.sh).
+Steps:
 
-Task 4: Main Terraform Configuration
-Create the main Terraform configuration file (main.tf) in the project directory.
+Set up a public subnet for resources accessible from the internet.
+Create a private subnet for resources with no direct internet access.
+Configure a NAT Gateway for private subnet internet access.
+Instructions for Terraform:
 
-Use the EC2 and Security Group modules to create the necessary infrastructure for the EC2 instance.
+Utilize Terraform to define subnets, security groups, and NAT Gateway.
+Ensure proper association of resources with corresponding subnets.
+Document Terraform commands for execution.
+3. AWS MySQL RDS Setup
+SECURITY GROUP ARCHITECTURE
+Security Group Architecture
 
-Task 5: Deployment
-Run terraform init and terraform apply to deploy the EC2 instance with Apache2.
+Objective: Deploy a managed MySQL database using Amazon RDS for WordPress data storage.
 
-Access the EC2 instance and verify that Apache2 is installed and running.
+Steps:
 
-Instructions:
-Create a new directory for your Terraform project using a terminal (mkdir terraform-ec2-apache).
+Create an Amazon RDS instance with the MySQL engine.
+Configure security groups for the RDS instance.
+Connect WordPress to the RDS database.
+Instructions for Terraform:
 
-Change into the project directory (cd terraform-ec2-apache).
+Define Terraform scripts for RDS instance creation.
+Configure security groups and define necessary parameters.
+Document Terraform commands for execution.
+4. EFS Setup for WordPress Files
+Objective: Utilize Amazon Elastic File System (EFS) to store WordPress files for scalable and shared access.
 
-Create directories for the EC2 and Security Group modules (mkdir -p modules/ec2 and mkdir -p modules/security_group).
+Steps:
 
-Write the EC2 module configuration (nano modules/ec2/main.tf) to create an EC2 instance.
+Create an EFS file system.
+Mount the EFS file system on WordPress instances.
+Configure WordPress to use the shared file system.
+Instructions for Terraform:
 
-Write the Security Group module configuration (nano modules/security_group/main.tf) to create a Security Group.
+Develop Terraform scripts to create EFS file system.
+Define configurations for mounting EFS on WordPress instances.
+Document Terraform commands for execution.
+5. Application Load Balancer
+Objective: Set up an Application Load Balancer to distribute incoming traffic among multiple instances, ensuring high availability and fault tolerance.
 
-Write the UserData script (nano apache_userdata.sh) to install and configure Apache2.
+Steps:
 
+Create an Application Load Balancer.
+Configure listener rules for routing traffic to instances.
+Integrate Load Balancer with Auto Scaling group.
+Instructions for Terraform:
 
-```
-#!/bin/bash
-sudo yum update -y
-sudo yum install -y httpd
-sudo systemctl start httpd
-sudo systemctl enable httpd
-echo "<h1>Hello World from $(hostname -f)</h1>" | sudo tee /var/www/html/index.html
-Make the UserData script executable (chmod +x apache_userdata.sh).
-```
+Use Terraform to define Application Load Balancer configurations.
+Integrate Load Balancer with Auto Scaling group.
+Document Terraform commands for execution.
+6. Auto Scaling Group
+Objective: Implement Auto Scaling to automatically adjust the number of instances based on traffic load.
 
-Create the main Terraform configuration file (nano main.tf) and use the EC2 and Security Group modules.
+Steps:
 
+Create an Auto Scaling group.
+Define scaling policies based on metrics like CPU utilization.
+Configure launch configurations for instances.
+Instructions for Terraform:
 
-```
-module "security_group" {"\n  source = \"./modules/security_group\"\n  // Add variables for customizing the Security Group if needed\n"}
-
-module "ec2_instance" {"\n  source          = \"./modules/ec2\"\n  security_group_id = module.security_group.security_group_id\n  user_data       = file(\"apache_userdata.sh\")\n  // Add other variables as needed\n"}
-```
-Run terraform init and terraform apply to deploy the EC2 instance with Apache2.
-
-Access the EC2 instance using its public IP and verify that Apache2 is installed and running.
-
-Document your observations and any challenges faced during the project.
-
-Side Note:
-
-```
-- Ensure you have the AWS CLI installed and configured with appropriate credentials.
-- Modify variables and configurations in the modules based on your specific requirements.
-- This is a learning exercise; use it to gain hands-on experience with Terraform, EC2, UserData, and Security Groups.
-```
+Develop Terraform scripts for Auto Scaling group creation.
+Define scaling policies and launch configurations.
+Document Terraform commands for execution.
+Note: Provide thorough documentation for each Terraform script and include necessary variable configurations. Encourage students to perform a live demonstration of the WordPress site, showcasing auto-scaling capabilities by simulating increased traffic. The documentation should explain the security measures implemented at each step.
