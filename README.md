@@ -1,78 +1,83 @@
-# Mini Project: Hosting a Dynamic Web App on AWS with Terraform Module, Docker, Amazon ECR, and ECS
-**Purpose:**
-In this mini project, you will use Terraform to create a modular infrastructure for hosting a dynamic web application on Amazon ECS (Elastic Container Service). The project involves containerizing the web app using Docker, pushing the Docker image to Amazon ECR (Elastic Container Registry), and deploying the app on ECS.
+# Mini Project: EC2 Module and Security Group Module with Apache2 UserData
+Purpose:
+In this mini project, you will use Terraform to create modularized configurations for deploying an EC2 instance with a specified Security Group and Apache2 installed using UserData.
 
-**Objectives:**
+Objectives:
 Terraform Module Creation:
 
 Learn how to create Terraform modules for modular infrastructure provisioning.
-Dockerization:
+EC2 Instance Configuration:
 
-Containerize a dynamic web application using Docker.
-Amazon ECR Configuration:
+Configure Terraform to create an EC2 instance.
+Security Group Configuration:
 
-Configure Terraform to create an Amazon ECR repository for storing Docker images.
-Amazon ECS Deployment:
+Create a separate module for the Security Group associated with the EC2 instance.
+UserData Script:
 
-Use Terraform to provision an ECS cluster and deploy the Dockerized web app.
+Utilize UserData to install and configure Apache2 on the EC2 instance.
 Project Tasks:
-Task 1: Dockerization of Web App
-Create a dynamic web application using a technology of your choice (e.g., Node.js, Flask, Django).
+Task 1: EC2 Module
+Create a new directory for your Terraform project (e.g., terraform-ec2-apache).
 
-Write a Dockerfile to containerize the web application.
+Inside the project directory, create a directory for the EC2 module (e.g., modules/ec2).
 
-Test the Docker image locally to ensure the web app runs successfully within a container.
+Write a Terraform module (modules/ec2/main.tf) to create an EC2 instance.
 
-Task 2: Terraform Module for Amazon ECR
-Create a new directory for your Terraform project (e.g., terraform-ecs-webapp).
+Task 2: Security Group Module
+Inside the project directory, create a directory for the Security Group module (e.g., modules/security_group).
 
-Inside the project directory, create a directory for the Amazon ECR module (e.g., modules/ecr).
+Write a Terraform module (modules/security_group/main.tf) to create a Security Group for the EC2 instance.
 
-Write a Terraform module (modules/ecr/main.tf) to create an Amazon ECR repository for storing Docker images.
+Task 3: UserData Script
+Write a UserData script to install and configure Apache2 on the EC2 instance. Save it as a separate file (e.g., apache_userdata.sh).
 
-Task 3: Terraform Module for ECS
-Inside the project directory, create a directory for the ECS module (e.g., modules/ecs).
-
-Write a Terraform module (modules/ecs/main.tf) to provision an ECS cluster and deploy the Dockerized web app.
+Ensure that the UserData script is executable (chmod +x apache_userdata.sh).
 
 Task 4: Main Terraform Configuration
 Create the main Terraform configuration file (main.tf) in the project directory.
 
-Use the ECR and ECS modules to create the necessary infrastructure for hosting the web app.
+Use the EC2 and Security Group modules to create the necessary infrastructure for the EC2 instance.
 
 Task 5: Deployment
-Build the Docker image of your web app.
+Run terraform init and terraform apply to deploy the EC2 instance with Apache2.
 
-Push the Docker image to the Amazon ECR repository created by Terraform.
-
-Run terraform init and terraform apply to deploy the ECS cluster and the web app.
-
-Access the web app through the public IP or DNS of the ECS service.
+Access the EC2 instance and verify that Apache2 is installed and running.
 
 Instructions:
-Create a new directory for your Terraform project using a terminal (mkdir terraform-ecs-webapp).
+Create a new directory for your Terraform project using a terminal (mkdir terraform-ec2-apache).
 
-Change into the project directory (cd terraform-ecs-webapp).
+Change into the project directory (cd terraform-ec2-apache).
 
-Create directories for the ECR and ECS modules (mkdir -p modules/ecr and mkdir -p modules/ecs).
+Create directories for the EC2 and Security Group modules (mkdir -p modules/ec2 and mkdir -p modules/security_group).
 
-Write the ECR module configuration (nano modules/ecr/main.tf) to create an ECR repository.
+Write the EC2 module configuration (nano modules/ec2/main.tf) to create an EC2 instance.
 
-Write the ECS module configuration (nano modules/ecs/main.tf) to provision an ECS cluster and deploy the Dockerized web app.
+Write the Security Group module configuration (nano modules/security_group/main.tf) to create a Security Group.
 
-Create the main Terraform configuration file (nano main.tf) and use the ECR and ECS modules.
+Write the UserData script (nano apache_userdata.sh) to install and configure Apache2.
 
 
 ```
-module "ecr" {"\n  source = \"./modules/ecr\"\n  repository_name = \"your-webapp-repo\"\n"}
-
-module "ecs" {"\n  source = \"./modules/ecs\"\n  ecr_repository_url = module.ecr.repository_url\n  // Add other variables as needed\n"}
+#!/bin/bash
+sudo yum update -y
+sudo yum install -y httpd
+sudo systemctl start httpd
+sudo systemctl enable httpd
+echo "<h1>Hello World from $(hostname -f)</h1>" | sudo tee /var/www/html/index.html
+Make the UserData script executable (chmod +x apache_userdata.sh).
 ```
-Build the Docker image of your web app and push it to the ECR repository.
 
-Run terraform init and terraform apply to deploy the ECS cluster and the web app.
+Create the main Terraform configuration file (nano main.tf) and use the EC2 and Security Group modules.
 
-Access the web app through the public IP or DNS of the ECS service.
+
+```
+module "security_group" {"\n  source = \"./modules/security_group\"\n  // Add variables for customizing the Security Group if needed\n"}
+
+module "ec2_instance" {"\n  source          = \"./modules/ec2\"\n  security_group_id = module.security_group.security_group_id\n  user_data       = file(\"apache_userdata.sh\")\n  // Add other variables as needed\n"}
+```
+Run terraform init and terraform apply to deploy the EC2 instance with Apache2.
+
+Access the EC2 instance using its public IP and verify that Apache2 is installed and running.
 
 Document your observations and any challenges faced during the project.
 
@@ -81,6 +86,5 @@ Side Note:
 ```
 - Ensure you have the AWS CLI installed and configured with appropriate credentials.
 - Modify variables and configurations in the modules based on your specific requirements.
-- Replace placeholder values in the main configuration file with actual values.
-- This is a learning exercise; use it to gain hands-on experience with Terraform, Docker, Amazon ECR, and ECS.
+- This is a learning exercise; use it to gain hands-on experience with Terraform, EC2, UserData, and Security Groups.
 ```
