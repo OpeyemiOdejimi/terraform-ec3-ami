@@ -2,12 +2,12 @@
 
 ## Project: High-Performance WordPress Site for DigitalBoost
 
-### 📄 Project Description
+###  Project Description
 This project automates the deployment of a scalable, secure, and cost-effective WordPress website on AWS using Terraform. It includes VPC setup, public/private subnets, NAT Gateway, RDS MySQL, EFS, Application Load Balancer, and Auto Scaling.
 
 ---
 
-## 📁 Directory Structure
+##  Directory Structure
 ```
 terraform-wordpress/
 ├── main.tf
@@ -27,14 +27,14 @@ terraform-wordpress/
 
 ---
 
-## 🚀 Prerequisites
+##  Prerequisites
 - AWS CLI configured
 - Terraform installed (v1.0+)
 - SSH key pair (for EC2 access)
 
 ---
 
-## ⚙️ Steps and Code Summary
+##  Steps and Code Summary
 
 ### 1. **VPC Setup** - `vpc.tf`
 ```hcl
@@ -107,7 +107,7 @@ sudo mount -t nfs4 -o nfsvers=4.1 ${efs_dns}:/ /var/www/html
 
 ---
 
-## 🔐 Security Measures
+##  Security Measures
 - **Security Groups:**
   - RDS only accessible from EC2
   - EC2 only accessible via ALB and SSH (restricted IP)
@@ -116,7 +116,7 @@ sudo mount -t nfs4 -o nfsvers=4.1 ${efs_dns}:/ /var/www/html
 
 ---
 
-## 🧪 Demonstration Guide
+##  Demonstration Guide
 1. Run `terraform init` and `terraform apply`
 2. Access the ALB DNS name to visit the WordPress site
 3. Simulate traffic using ApacheBench or similar tool:
@@ -127,7 +127,7 @@ sudo mount -t nfs4 -o nfsvers=4.1 ${efs_dns}:/ /var/www/html
 
 ---
 
-## 📌 Commands to Run
+##  Commands to Run
 ```bash
 terraform init
 terraform plan
@@ -136,7 +136,7 @@ terraform apply -auto-approve
 
 ---
 
-## 📘 Variables Example - `variables.tf`
+##  Variables Example - `variables.tf`
 ```hcl
 variable "vpc_cidr" { default = "10.0.0.0/16" }
 variable "public_subnet_cidr" { default = "10.0.1.0/24" }
@@ -146,7 +146,7 @@ variable "private_subnet_cidr" { default = "10.0.2.0/24" }
 
 ---
 
-## 📤 Outputs - `outputs.tf`
+##  Outputs - `outputs.tf`
 ```hcl
 output "alb_dns_name" {
   value = aws_lb.app_lb.dns_name
@@ -155,11 +155,10 @@ output "alb_dns_name" {
 
 ---
 
-## ✅ Final Notes
+##  Final Notes
 - Use `terraform destroy` to clean up
 - All Terraform modules are reusable and modular
 - Validate logs and scaling using AWS Console or CLI
 
 ---
 
-Happy Deploying 🚀
